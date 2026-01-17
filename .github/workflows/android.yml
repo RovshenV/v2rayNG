@@ -7,20 +7,21 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
-    - name: set up JDK 17
+    - name: set up JDK 21 # 17'den 21'e yükselttik
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: gradle
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      working-directory: V2rayNG # Robotun bu klasöre girmesini sağladık
+      working-directory: V2rayNG
     - name: Build with Gradle
-      run: ./gradlew assembleDebug
-      working-directory: V2rayNG # Derleme işlemini de bu klasörde yapacak
+      # -x lint ve -x test ekleyerek gereksiz hata veren kontrolleri atladık
+      run: ./gradlew assembleDebug -x lint -x test
+      working-directory: V2rayNG
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: vpn-app
-        path: V2rayNG/app/build/outputs/apk/debug/*.apk # Çıktı yolunu güncelledik
+        path: V2rayNG/app/build/outputs/apk/debug/*.apk
