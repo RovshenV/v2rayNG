@@ -7,19 +7,29 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
-    - name: set up JDK 21 # 17'den 21'e yükselttik
+        fetch-depth: 0
+
+    - name: set up JDK 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
         cache: gradle
+
+    - name: Setup Android NDK
+      uses: android-actions/setup-android@v3
+      with:
+        ndk-version: '25.1.8937393' # v2rayNG için en stabil sürüm
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       working-directory: V2rayNG
+
     - name: Build with Gradle
-      # -x lint ve -x test ekleyerek gereksiz hata veren kontrolleri atladık
-      run: ./gradlew assembleDebug -x lint -x test
+      # Belleği artırmak için org.gradle.jvmargs ekledik ve hataları atladık
+      run: ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g" -x lint -x test
       working-directory: V2rayNG
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
